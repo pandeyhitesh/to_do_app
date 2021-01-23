@@ -4,7 +4,10 @@ import 'package:to_do_app/constants.dart';
 import 'package:to_do_app/models/todo_task_model.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:to_do_app/widgets/add_todo_header_widget.dart';
+import 'package:to_do_app/widgets/emti_list_msg_widget.dart';
 import 'shared_pref.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -28,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isClearingList = false;
   bool isTodoListEmpty = true;
   bool isSelectingWeight = false;
+  bool isDisplayingAbout = false;
 
   DateTime taskDate = DateTime.now();
   String _selectedDate = '';
@@ -37,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String dropdownValue = 'Clear List';
 
-  double _value = 3.0;
+  double _value = 5.0;
 
   // List<TODOModel> toDos = [];
 
@@ -69,6 +73,12 @@ class _HomeScreenState extends State<HomeScreen> {
       TodoModel _todoList =
           TodoModel.fromJson(await sharedPref.read("todoList"));
       _showSnackBar('ToDo List Loaded!');
+
+      // if (_todoList.todoList.isNotEmpty) {
+      //   _showSnackBar('ToDo List Loaded!');
+      // } else {
+      //   _showSnackBar('Start Adding ToDo!');
+      // }
       // Scaffold.of(context).showSnackBar(SnackBar(
       //     content: Text('ToDo List Loaded!'),
       //     duration: const Duration(milliseconds: 500)));
@@ -99,8 +109,8 @@ class _HomeScreenState extends State<HomeScreen> {
     sharedPref.remove("todoList");
     setState(() {
       isClearingList = false;
-      loadTodoList = TodoModel(todoList: []);
-      saveTodoList = TodoModel(todoList: []);
+      loadTodoList.todoList.clear();
+      saveTodoList.todoList.clear();
       isTodoListEmpty = true;
     });
 
@@ -123,6 +133,23 @@ class _HomeScreenState extends State<HomeScreen> {
     _showSnackBar('ToDo Deleted!');
   }
 
+  _launchURL(String url) async {
+    final Uri uri = Uri(
+      scheme: 'https',
+      path: url,
+      queryParameters: {'name': 'Woolha dot com', 'about': 'Flutter Dart'},
+    );
+
+    if (await canLaunch('https://' + url)) {
+      await launch(
+        uri.toString(),
+        forceWebView: false,
+      );
+    } else {
+      print('Could not launch $url');
+    }
+  }
+
   @override
   void initState() {
     checkSharedPref();
@@ -134,54 +161,30 @@ class _HomeScreenState extends State<HomeScreen> {
     double _screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text(
-          'ToDo',
-          style: TextStyle(color: yellow),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            tooltip: 'Clrear All',
-            icon: Icon(
-              Icons.clear_all,
-              color: yellow,
-            ),
-            onPressed: () {
-              if (!isTodoListEmpty) {
-                _initateClearList();
-              }
-            },
-          ),
-          IconButton(
-            tooltip: 'About',
-            icon: Icon(
-              Icons.info,
-              color: yellow,
-            ),
-            onPressed: () {},
-          ),
-        ],
-      ),
+      appBar: customAppBar(),
       backgroundColor: black,
       body: SafeArea(
         child: Stack(
           children: [
             // customAppBar(),
-            SingleChildScrollView(
-              child: Container(
-                height: _screenHeight,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                          itemCount: loadTodoList.todoList.length ?? 0,
-                          itemBuilder: (context, index) {
-                            return _displayToDo(loadTodoList.todoList[index]);
-                          }),
-                    ),
-                  ],
+            Container(
+              height: _screenHeight,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('logos/wallp3.jpg'),
+                  fit: BoxFit.cover,
                 ),
+              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                        itemCount: loadTodoList.todoList.length,
+                        itemBuilder: (context, index) {
+                          return _displayToDo(loadTodoList.todoList[index]);
+                        }),
+                  ),
+                ],
               ),
             ),
             addingNewToDo
@@ -201,35 +204,73 @@ class _HomeScreenState extends State<HomeScreen> {
             isTodoListEmpty && !addingNewToDo
                 ? emptyListMessage()
                 : Container(),
+
+            isDisplayingAbout ? displayAbout() : Container(),
           ],
         ),
       ),
-      floatingActionButton: !addingNewToDo
-          ? FloatingActionButton(
-              onPressed: () {
-                setState(() {
-                  addingNewToDo = true;
-                });
-              },
-              child: Icon(Icons.add),
-              tooltip: 'Add ToDo',
-              backgroundColor: yellow,
-            )
-          : Container(),
+      floatingActionButton: floatingActionButton(),
     );
   }
 
-  Widget emptyListMessage() {
-    return Center(
-      child: Text(
-        'Create a ToDo...',
-        style: TextStyle(
-          fontSize: 20.0,
-          letterSpacing: 1.2,
-          color: Colors.grey[700],
-        ),
+  Widget customAppBar() {
+    return AppBar(
+      title: Text(
+        'ToDo',
+        style: TextStyle(color: yellow),
       ),
+      centerTitle: true,
+      actions: [
+        IconButton(
+          tooltip: 'Clrear All',
+          icon: Icon(
+            Icons.clear_all,
+            color: yellow,
+          ),
+          onPressed: () {
+            if (!isTodoListEmpty) {
+              _initateClearList();
+            }
+          },
+        ),
+        IconButton(
+          tooltip: 'About',
+          icon: Icon(
+            Icons.info,
+            color: yellow,
+          ),
+          onPressed: () {
+            setState(() {
+              isDisplayingAbout = true;
+              addingDesc = false;
+              addingNewToDo = false;
+              selectingDateTime = false;
+              isDateTimeSelected = false;
+              isSelectingWeight = false;
+              _value = 5;
+              titleController.clear();
+              descController.clear();
+            });
+          },
+        ),
+      ],
     );
+  }
+
+  Widget floatingActionButton() {
+    return !addingNewToDo
+        ? FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                addingNewToDo = true;
+                isDisplayingAbout = false;
+              });
+            },
+            child: Icon(Icons.add),
+            tooltip: 'Add ToDo',
+            backgroundColor: yellow,
+          )
+        : Container();
   }
 
   // Widget customAppBar() {
@@ -270,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             addToDoHeader(),
             SizedBox(height: 15),
-            addTitle(),
+            addTitle(titleController, titleFocusNode, true),
             SizedBox(height: 5),
             addDescription(),
             SizedBox(height: 5),
@@ -285,25 +326,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget addToDoHeader() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 15.0),
-      child: Center(
-        child: Text(
-          'Add New ToDo',
-          style: addToDoHeadingTextStyle,
-        ),
-      ),
-    );
-  }
-
-  Widget addTitle() {
+  Widget addTitle(TextEditingController _controller, FocusNode _focusNode,
+      bool _autoFocus) {
     return SizedBox(
       height: 60.0,
       width: 300.0,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: _inputTitleField(titleController, titleFocusNode, true),
+        child: _inputTitleField(_controller, _focusNode, _autoFocus),
       ),
     );
   }
@@ -409,7 +439,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   selectingDateTime = false;
                   isDateTimeSelected = false;
                   isSelectingWeight = false;
-                  _value = 3;
+                  _value = 5;
                   titleController.clear();
                   descController.clear();
                 });
@@ -442,7 +472,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                   if (isSelectingWeight) {
                     int _weight = (_value * 100).toInt();
-                    int _id = saveTodoList.todoList.length + 1;
+                    int _id;
+                    if (saveTodoList.todoList.isNotEmpty) {
+                      _id = saveTodoList.todoList.last.id + 1;
+                    } else {
+                      _id = 1;
+                    }
+
                     TodoDataModel newToDo = TodoDataModel(
                       title: titleController.text,
                       description: descController.text,
@@ -452,7 +488,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       id: _id,
                     );
                     print('\n\nid = ${newToDo.id}');
-                    saveTodoList.todoList.add(newToDo);
 
                     setState(() {
                       saveTodoList.todoList.add(newToDo);
@@ -461,7 +496,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       selectingDateTime = false;
                       isDateTimeSelected = false;
                       isSelectingWeight = false;
-                      _value = 3;
+                      isTodoListEmpty = false;
+                      _value = 5;
                       titleController.clear();
                       descController.clear();
                     });
@@ -510,6 +546,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _displayToDo(TodoDataModel todoModel) {
     return Container(
       width: double.infinity,
+      color: Colors.black54,
       child: Column(
         children: [
           ListTile(
@@ -529,6 +566,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontSize: 16,
                 letterSpacing: 1.0,
               ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
             subtitle: Column(
               children: [
@@ -651,6 +690,172 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget displayAbout() {
+    return Center(
+      child: FittedBox(
+        child: Container(
+          // height: 300,
+          width: 300,
+          padding: EdgeInsets.all(30.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10.0),
+            color: yellow,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'About',
+                style: addToDoHeadingTextStyle,
+              ),
+              SizedBox(
+                height: 30.0,
+              ),
+              Container(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'HITESH PANDEY',
+                          style: aboutNameTextStyle,
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(
+                      height: 15.0,
+                    ),
+                    Container(
+                      // width: 200,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          InkWell(
+                            child: SizedBox(
+                              height: logoSize - 10,
+                              width: logoSize - 10,
+                              child: Image.asset(
+                                'logos/linkedin.png',
+                              ),
+                            ),
+                            onTap: () => _launchURL(linkedInUrl),
+                          ),
+                          SizedBox(width: 5.0),
+                          InkWell(
+                            child: SizedBox(
+                              height: logoSize,
+                              width: logoSize,
+                              child: Image.asset(
+                                'logos/github2.png',
+                              ),
+                            ),
+                            onTap: () => _launchURL(githubUrl),
+                          ),
+                          SizedBox(width: 5.0),
+                          InkWell(
+                            child: SizedBox(
+                              height: logoSize,
+                              width: logoSize,
+                              child: Image.asset('logos/insta1.png'),
+                            ),
+                            onTap: () => _launchURL(instaUrl),
+                          ),
+                          SizedBox(width: 5.0),
+                        ],
+                      ),
+                    ),
+
+                    ///Email id
+                    SizedBox(height: 25.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Email :',
+                          style: aboutSubtitleTextStyle,
+                        ),
+                        SizedBox(
+                          width: 5.0,
+                        ),
+                        Text(
+                          'hiteshpandey206@gmail.com',
+                          style: aboutInfoTextStyle.copyWith(
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // ///Github
+                    // SizedBox(height: 15.0),
+                    // Text(
+                    //   'GitHub:',
+                    //   style: aboutSubtitleTextStyle,
+                    // ),
+                    // SizedBox(height: 5.0),
+                    // Text(
+                    //   'github.com/pandeyhitesh',
+                    //   style: aboutInfoTextStyle,
+                    // ),
+
+                    // ///LinkedIn
+                    // SizedBox(height: 15.0),
+                    // Text('LinkedIn:', style: aboutSubtitleTextStyle),
+                    // SizedBox(height: 5.0),
+                    // Text(
+                    //   'linkedIn.com/pandeyhitesh',
+                    //   style: aboutInfoTextStyle,
+                    // ),
+
+                    ///download link
+                    SizedBox(height: 15.0),
+                    Text('Download the app from here:',
+                        style: aboutSubtitleTextStyle),
+                    SizedBox(height: 10.0),
+                    InkWell(
+                      child: Center(
+                        child: Text(
+                          'Download',
+                          style: aboutInfoTextStyle.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue[700],
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ),
+                      onTap: () => _launchURL(githubUrl),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 25.0,
+              ),
+              Container(
+                child: FlatButton(
+                  child: Text('Okay'),
+                  color: grey,
+                  onPressed: () {
+                    setState(() {
+                      isDisplayingAbout = false;
+                    });
+                  },
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   // Widget confirmToRemoveToDo(TodoDataModel todo) {
   //   return FittedBox(
   //     child: Container(
@@ -761,6 +966,7 @@ class _HomeScreenState extends State<HomeScreen> {
       cursorWidth: 5.0,
       cursorRadius: Radius.circular(10.0),
       style: inputTextStyle,
+      keyboardType: TextInputType.name,
       onFieldSubmitted: (val) {
         _focusNode.unfocus();
       },
@@ -809,6 +1015,7 @@ class _HomeScreenState extends State<HomeScreen> {
       maxLines: 5,
       minLines: 2,
       style: inputTextStyle,
+      keyboardType: TextInputType.multiline,
       onFieldSubmitted: (val) {
         _focusNode.unfocus();
       },
@@ -855,7 +1062,7 @@ class _HomeScreenState extends State<HomeScreen> {
           fontWeight: FontWeight.bold,
         ),
         doneStyle: TextStyle(
-          color: Colors.green,
+          color: Colors.green[700],
           fontWeight: FontWeight.bold,
         ),
         headerColor: yellow,

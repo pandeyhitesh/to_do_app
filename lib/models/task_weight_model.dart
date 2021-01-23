@@ -1,4 +1,0 @@
-class TaskWeightModel{
-  int weight;
-
-}
