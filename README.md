@@ -12,6 +12,8 @@
 
 #### - Does not require internet connection
 
+### - Download the app from here
+https://github.com/pandeyhitesh/to_do_app/blob/master/apk_file/app-armeabi-v7a-release.apk
 
 ## Home page
 |Home     |Home     |
