@@ -3,10 +3,10 @@
 
 ## Features
 #### - Add new ToDo
-##### - ToDo Title
-##### - Description
-##### - Task Date and Time
-##### - ToDo Importance 
+###### - ToDo Title
+###### - Description
+###### - Task Date and Time
+###### - ToDo Importance 
 #### - Delete a perticular ToDo
 #### - Clear all ToDo
 
@@ -16,16 +16,16 @@
 ## Home page
 |Home     |Home     |
 |----------|----------|
-|<img src="https://github.com/pandeyhitesh/TATHYA/blob/master/assets/screenshots/home1.jpg" width="400">|<img src="https://github.com/pandeyhitesh/TATHYA/blob/master/assets/screenshots/home2.jpg" width="400">
+|<img src="https://github.com/pandeyhitesh/to_do_app/blob/master/todoscreens/home-empty.jpg" width="400">|<img src="https://github.com/pandeyhitesh/to_do_app/blob/master/todoscreens/homo-todo.jpg" width="400">
 
-## Profile and Notice Screen
-|Notice     |Profile     |
+## Create ToDo
+|Enter Title     |Create ToDo Form     |
 |----------|----------|
-|<img src="https://github.com/pandeyhitesh/TATHYA/blob/master/assets/screenshots/notice.jpg" width="400">|<img src="https://github.com/pandeyhitesh/TATHYA/blob/master/assets/screenshots/profile.jpg" width="400">
+|<img src="https://github.com/pandeyhitesh/to_do_app/blob/master/todoscreens/create-todo.jpg" width="400">|<img src="https://github.com/pandeyhitesh/to_do_app/blob/master/todoscreens/create-todo-full.jpg" width="400">
 
 
-## Home page
-|Home     |Home     |
+## About
+|Crear All |About     |
 |----------|----------|
-|<img src="https://github.com/pandeyhitesh/TATHYA/blob/master/assets/screenshots/home1.jpg" width="400">|<img src="https://github.com/pandeyhitesh/TATHYA/blob/master/assets/screenshots/home2.jpg" width="400">
+|<img src="https://github.com/pandeyhitesh/to_do_app/blob/master/todoscreens/clear-all.jpg" width="400">|<img src="https://github.com/pandeyhitesh/to_do_app/blob/master/todoscreens/about.jpg" width="400">
 
