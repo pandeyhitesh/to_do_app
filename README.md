@@ -1,16 +1,31 @@
-# to_do_app
+# ToDo
+### To do app
 
-A new Flutter application.
+## Features
+#### - Add new ToDo
+##### - ToDo Title
+##### - Description
+##### - Task Date and Time
+##### - ToDo Importance 
+#### - Delete a perticular ToDo
+#### - Clear all ToDo
 
-## Getting Started
+#### - Does not require internet connection
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+## Home page
+|Home     |Home     |
+|----------|----------|
+|<img src="https://github.com/pandeyhitesh/TATHYA/blob/master/assets/screenshots/home1.jpg" width="400">|<img src="https://github.com/pandeyhitesh/TATHYA/blob/master/assets/screenshots/home2.jpg" width="400">
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Profile and Notice Screen
+|Notice     |Profile     |
+|----------|----------|
+|<img src="https://github.com/pandeyhitesh/TATHYA/blob/master/assets/screenshots/notice.jpg" width="400">|<img src="https://github.com/pandeyhitesh/TATHYA/blob/master/assets/screenshots/profile.jpg" width="400">
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+## Home page
+|Home     |Home     |
+|----------|----------|
+|<img src="https://github.com/pandeyhitesh/TATHYA/blob/master/assets/screenshots/home1.jpg" width="400">|<img src="https://github.com/pandeyhitesh/TATHYA/blob/master/assets/screenshots/home2.jpg" width="400">
+
